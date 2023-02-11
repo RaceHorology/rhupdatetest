@@ -83,22 +83,23 @@ jobs:
           generateReleaseNotes: true
           commit: ${{ needs.build.outputs.commit }}
           token: ${{ secrets.GITHUB_TOKEN }}
+          
       - name: output html
         run: |
           Write-Host "Debug HTML ID: ${{ steps.uploadAsPreRelease.outputs.id }}" 
           Write-Host "Debug HTML Output: ${{ steps.uploadAsPreRelease.outputs.html_url }}" 
       - name: retrieve release body
-        uses: actions/github-script@v6
-        id: get_releasebody
-        run: |
-          const { rest, context } = require("@actions/github");
-          const release = await rest.repos.getRelease({
-            ...context.repo,
-            release_id: env.RELEASE_ID
-          });
-          console.log(release.data.body);        env:
-        env:
-          RELEASE_ID: ${{ steps.uploadAsPreRelease.outputs.id }}        
+          uses: actions/http-action@v1
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          with:
+            url: https://api.github.com/repos/${{ github.repository }}/releases/${{ env.RELEASE_ID }}
+            method: GET
+            headers: |
+              Accept: application/vnd.github+json
+              Authorization: token ${{ env.GITHUB_TOKEN }}
+          id: get_releasebody
+
       - name: Print Release Body
         run: |
           echo "Release Body: ${{ steps.get_releasebody.outputs.body }}"
