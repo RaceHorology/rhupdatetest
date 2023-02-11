@@ -91,11 +91,17 @@ jobs:
 
       - name: Retrieve Release Body
         run: |
-          curl -H "Accept: application/vnd.github+json" \
-                -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-                https://api.github.com/repos/${{ github.repository }}/releases/${{ env.RELEASE_ID }} > release.json
+          $url = "https://api.github.com/repos/$($env:GITHUB_REPOSITORY)/releases/$($env:RELEASE_ID)"
+          $headers = @{
+            "Accept" = "application/vnd.github+json"
+            "Authorization" = "token $($env:GITHUB_TOKEN)"
+          }
+
+          $release = Invoke-WebRequest -Method Get -Uri $url -Headers $headers
+          $release_body = $release.Content | ConvertFrom-Json | Select-Object -ExpandProperty body
+        env:
+          RELEASE_ID: ${{ steps.uploadAsPreRelease.outputs.id }}
 
       - name: Print Release Body
         run: |
-          release_body=$(jq -r '.body' release.json)
-          echo "Release Body: ${release_body}"
+          Write-Host "Release Body: $($env:release_body)"
