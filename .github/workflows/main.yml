@@ -86,3 +86,13 @@ jobs:
       - name: output html
         run: |
           Write-Host "Debug HTML Output: ${{ steps.uploadAsPreRelease.outputs.html_url }}" 
+      - name: retrieve release body
+        uses: actions/github@v2
+        id: get_releasebody
+        ref: ${{ env.GITHUB_REF }}
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        action: get-release
+        release-id: ${{ steps.uploadAsPreRelease.outputs.id }}        
+      - name: Print Release Body
+        run: |
+          echo "Release Body: ${{ steps.get_releasebody.outputs.body }}"
