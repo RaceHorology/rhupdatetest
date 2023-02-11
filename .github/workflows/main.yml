@@ -116,7 +116,7 @@ jobs:
           $xml_sha = $xml_request.Content | ConvertFrom-Json | Select-Object -ExpandProperty sha
           $xml_content = $xml_request.Content | ConvertFrom-Json | Select-Object -ExpandProperty content
           #$xml_content = [Convert]::FromBase64String([Text.Encoding]::UTF8.GetBytes($xml_content))
-          $xml_content = [Text.Encoding]::UTF8.GetBytes([Convert]::FromBase64String($xml_content))
+          $xml_content = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($xml_content))
 
 
           # generate xml file content
