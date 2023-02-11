@@ -90,14 +90,15 @@ jobs:
       - name: retrieve release body
         uses: actions/github-script@v6
         id: get_releasebody
-        with: 
-          script: |
-            const release = await github.rest.repo.releases.{release_id}({
-              release_id: env.release-id
-            });
-            console.log(release.data.body);
+        run: |
+          const { rest, context } = require("@actions/github");
+          const release = await rest.repos.getRelease({
+            ...context.repo,
+            release_id: env.RELEASE_ID
+          });
+          console.log(release.data.body);        env:
         env:
-          release-id: ${{ steps.uploadAsPreRelease.outputs.id }}        
+          RELEASE_ID: ${{ steps.uploadAsPreRelease.outputs.id }}        
       - name: Print Release Body
         run: |
           echo "Release Body: ${{ steps.get_releasebody.outputs.body }}"
