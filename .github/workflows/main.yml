@@ -108,9 +108,9 @@ jobs:
 
           # generate xml file content
           $xmlfile_new = $xml_content `
-              -replace '<url>.*</url>', '<url>https://github.com/RaceHorology/RaceHorology/releases/download/$RELEASE_PREFIX${{ needs.build.outputs.version }}/RaceHorologySetup-${{ needs.build.outputs.version }}.msi</url>' `
-              -replace '<changelog>.*</changelog>', '<changelog>https://update.race-horology.com/versions/$RELEASE_PREFIX${{ needs.build.outputs.version }}.html</changelog>' `
-              -replace '<version>.*</version>', '<version>$RELEASE_PREFIX${{ needs.build.outputs.version }}</version>'
+              -replace '<url>.*</url>', '<url>https://github.com/RaceHorology/RaceHorology/releases/download/$env:RELEASE_PREFIX${{ needs.build.outputs.version }}/RaceHorologySetup-${{ needs.build.outputs.version }}.msi</url>' `
+              -replace '<changelog>.*</changelog>', '<changelog>https://update.race-horology.com/versions/$env:RELEASE_PREFIX${{ needs.build.outputs.version }}.html</changelog>' `
+              -replace '<version>.*</version>', '<version>$env:RELEASE_PREFIX${{ needs.build.outputs.version }}</version>'
 
           #upload the channel file
           $base64Content = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($xmlfile_new))
