@@ -96,7 +96,7 @@ jobs:
           Write-Host $release_body
 
           # get sha from existing xml file
-          $url = "https://api.github.com/repos/RaceHorology/rh-update/contents/channels/$($env:RELEASE_CHANNEL)channel.xml"
+          $url = "https://api.github.com/repos/RaceHorology/rh-update/contents/channels/$($env:RELEASE_CHANNEL)-channel.xml"
           $headers = @{
             "Accept" = "application/vnd.github+json"
             "Authorization" = "token $($env:UPDATE_TOKEN)"
@@ -125,7 +125,7 @@ jobs:
           $release_body = "# pre-${{ needs.build.outputs.version }}" + "`r`n" + "`r`n" + "**Datum:** " + $(Get-Date -UFormat %d.%m.%Y) + "`r`n" + "`r`n" + $release_body
           $base64Content = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($release_body))
           $body = @{
-            message = "Upload $($env:RELEASE_PREFIX)${{ needs.build.outputs.version }}.html file via Github Actions from main build project"
+            message = "Upload $($env:RELEASE_PREFIX)${{ needs.build.outputs.version }}.md file via Github Actions from main build project"
             content = $base64Content
           } | ConvertTo-Json
           $response = Invoke-RestMethod -Method Put -Uri "https://api.github.com/repos/RaceHorology/rh-update/contents/versions/$($env:RELEASE_PREFIX)${{ needs.build.outputs.version }}.md" -Headers @{Authorization = "Token $($env:UPDATE_TOKEN)"} -Body $body
