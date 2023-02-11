@@ -83,22 +83,22 @@ jobs:
           generateReleaseNotes: true
           commit: ${{ needs.build.outputs.commit }}
           token: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: output html
         run: |
           Write-Host "Debug HTML ID: ${{ steps.uploadAsPreRelease.outputs.id }}" 
           Write-Host "Debug HTML Output: ${{ steps.uploadAsPreRelease.outputs.html_url }}" 
       - name: retrieve release body
-          uses: actions/http-action@v1
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            url: https://api.github.com/repos/${{ github.repository }}/releases/${{ env.RELEASE_ID }}
-            method: GET
-            headers: |
-              Accept: application/vnd.github+json
-              Authorization: token ${{ env.GITHUB_TOKEN }}
-          id: get_releasebody
+        uses: actions/http-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          url: https://api.github.com/repos/${{ github.repository }}/releases/${{ env.RELEASE_ID }}
+          method: GET
+          headers: |
+            Accept: application/vnd.github+json
+            Authorization: token ${{ env.GITHUB_TOKEN }}
+        id: get_releasebody
 
       - name: Print Release Body
         run: |
