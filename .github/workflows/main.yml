@@ -90,6 +90,7 @@ jobs:
           Write-Host "Debug HTML Output: ${{ steps.uploadAsPreRelease.outputs.html_url }}" 
 
       - name: Retrieve Release Body
+        id: retrieve_body
         run: |
           $url = "https://api.github.com/repos/$($env:GITHUB_REPOSITORY)/releases/$($env:RELEASE_ID)"
           $headers = @{
@@ -102,7 +103,8 @@ jobs:
         env:
           RELEASE_ID: ${{ steps.uploadAsPreRelease.outputs.id }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          release_body: $release_body
 
       - name: Print Release Body
         run: |
-          Write-Host "Release Body: $($env:release_body)"
+          Write-Host "Release Body: ${{steps.retrieve_body.env.release_body)}}"
