@@ -107,9 +107,9 @@ jobs:
           $xml_content = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($xml_content))
 
           # generate xml file content
-          $new_url = "<url>https://github.com/RaceHorology/RaceHorology/releases/download/" + $($env:RELEASE_PREFIX) + ${{ needs.build.outputs.version }} + "/RaceHorologySetup-" + ${{ needs.build.outputs.version }} + ".msi</url>"
-          $new_changelog = "<changelog>https://update.race-horology.com/versions/" + $($env:RELEASE_PREFIX) + ${{ needs.build.outputs.version }} + ".html</changelog>"
-          $new_version = "<version>" + $($env:RELEASE_PREFIX) + ${{ needs.build.outputs.version }} + "</version>"
+          $new_url = "<url>https://github.com/RaceHorology/RaceHorology/releases/download/" + $($env:RELEASE_PREFIX) + "${{ needs.build.outputs.version }}" + "/RaceHorologySetup-" + "${{ needs.build.outputs.version }}" + ".msi</url>"
+          $new_changelog = "<changelog>https://update.race-horology.com/versions/" + $($env:RELEASE_PREFIX) + "${{ needs.build.outputs.version }}" + ".html</changelog>"
+          $new_version = "<version>" + $($env:RELEASE_PREFIX) + "${{ needs.build.outputs.version }}" + "</version>"
           $xmlfile_new = $xml_content `
               -replace '<url>.*</url>', ($new_url) `
               -replace '<changelog>.*</changelog>', ($new_changelog) `
