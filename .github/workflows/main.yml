@@ -85,17 +85,21 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: output html
         run: |
+          Write-Host "Debug HTML ID: ${{ steps.uploadAsPreRelease.outputs.id }}" 
           Write-Host "Debug HTML Output: ${{ steps.uploadAsPreRelease.outputs.html_url }}" 
       - name: retrieve release body
         uses: actions/github-script@v6
         id: get_releasebody
         with: 
           script: |
-            const release = await github.rest.releases({
-              release_id: release.id
+            const { rest, context } = require("@actions/github");
+            const release = await rest.repos.getRelease({
+              ...context.repo,
+              release_id: env.release-id
             });
             console.log(release.data.body);
-        release-id: ${{ steps.uploadAsPreRelease.outputs.id }}        
+        env:
+          release-id: ${{ steps.uploadAsPreRelease.outputs.id }}        
       - name: Print Release Body
         run: |
           echo "Release Body: ${{ steps.get_releasebody.outputs.body }}"
