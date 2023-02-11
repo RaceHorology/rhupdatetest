@@ -107,4 +107,4 @@ jobs:
 
       - name: Print Release Body
         run: |
-          Write-Host "Release Body: ${{steps.retrieve_body.env.release_body)}}"
+          Write-Host "Release Body: ${{steps.retrieve_body.env.release_body}}"
