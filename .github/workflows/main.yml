@@ -109,7 +109,7 @@ jobs:
 
           # generate xml file
 
-          $xmlfile = Get-Content -Path '${{ github.workspace }}\RaceHorology\.github\workflows\channel.xml.tpl'
+          $xmlfile = Get-Content -Path '${{ github.workspace }}\.github\workflows\channel.xml.tpl'
           $xmlfile_new = $xmlfile -replace '__VERSION__', 'pre-${{ needs.build.outputs.version }}'
           $xmlfile_new = $xmlfile -replace '__DL_URL__', 'https://github.com/RaceHorology/RaceHorology/releases/download/pre-${{ needs.build.outputs.version }}/RaceHorologySetup-${{ needs.build.outputs.version }}.msi'
           $xmlfile_new = $xmlfile -replace '__CHANGELOG_URL__', 'https://rh-update/racehorology.com/versions/pre-${{ needs.build.outputs.version }}.html'
