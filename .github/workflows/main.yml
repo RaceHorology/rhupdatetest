@@ -96,7 +96,7 @@ jobs:
           Write-Host $release_body
 
           # get sha from existing xml file
-          $url = "https://api.github.com/repos/RaceHorology/rh-update/contents/channels/$($env:RELEASE_PREFIX)-channel.xml"
+          $url = "https://api.github.com/repos/RaceHorology/rh-update/contents/channels/$($env:RELEASE_CHANNEL)channel.xml"
           $headers = @{
             "Accept" = "application/vnd.github+json"
             "Authorization" = "token $($env:UPDATE_TOKEN)"
@@ -115,11 +115,11 @@ jobs:
           #upload the channel file
           $base64Content = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($xmlfile_new))
           $body = @{
-            message = "Upload $($env:RELEASE_PREFIX)-channel.xml file for $($env:RELEASE_PREFIX)${{ needs.build.outputs.version }} release via Github Actions from main build project"
+            message = "Upload $($env:RELEASE_CHANNEL)-channel.xml file for $($env:RELEASE_PREFIX)${{ needs.build.outputs.version }} release via Github Actions from main build project"
             sha = $xml_sha
             content = $base64Content
           } | ConvertTo-Json
-          $response = Invoke-RestMethod -Method Put -Uri "https://api.github.com/repos/RaceHorology/rh-update/contents/channels/$($env:RELEASE_PREFIX)-channel.xml" -Headers @{Authorization = "Token $($env:UPDATE_TOKEN)"} -Body $body
+          $response = Invoke-RestMethod -Method Put -Uri "https://api.github.com/repos/RaceHorology/rh-update/contents/channels/$($env:RELEASE_CHANNEL)-channel.xml" -Headers @{Authorization = "Token $($env:UPDATE_TOKEN)"} -Body $body
 
           #upload the versions file
           $release_body = "# pre-${{ needs.build.outputs.version }}" + "`r`n" + "`r`n" + "**Datum:** " + $(Get-Date -UFormat %d.%m.%Y) + "`r`n" + "`r`n" + $release_body
