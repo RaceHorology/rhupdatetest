@@ -101,6 +101,15 @@ jobs:
           $release = Invoke-WebRequest -Method Get -Uri $url -Headers $headers
           $release_body = $release.Content | ConvertFrom-Json | Select-Object -ExpandProperty body
           Write-Host $release_body
+
+          #upload the file
+
+          $base64Content = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($release_body))
+          $body = @{
+            message = "Upload the file"
+            content = $base64Content
+          } | ConvertTo-Json
+          $response = Invoke-RestMethod -Method Post -Uri "https://api.github.com/repos/RaceHorology/r-update/test/FILE_NAME.txt" -Headers @{Authorization = "Token ${{ secrets.GITHUB_TOKEN }}"} -Body $body
         env:
           RELEASE_ID: ${{ steps.uploadAsPreRelease.outputs.id }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
