@@ -92,9 +92,7 @@ jobs:
         id: get_releasebody
         with: 
           script: |
-            const { rest, context } = require("@actions/github");
-            const release = await rest.repos.getRelease({
-              ...context.repo,
+            const release = await github.rest.repo.releases.{release_id}({
               release_id: env.release-id
             });
             console.log(release.data.body);
