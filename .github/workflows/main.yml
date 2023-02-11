@@ -71,6 +71,7 @@ jobs:
     runs-on: [windows-latest]
     steps:
       - name: Upload as pre-release 
+        id: uploadAsPreRelease
         uses: ncipollo/release-action@v1.12.0
         with:
           prerelease: true
@@ -82,4 +83,6 @@ jobs:
           generateReleaseNotes: true
           commit: ${{ needs.build.outputs.commit }}
           token: ${{ secrets.GITHUB_TOKEN }}
-
+      - name: output html
+        run: |
+          Write-Host "Debug HTML Output: ${{ steps.uploadAsPreRelease.outputs.html_url }}" 
