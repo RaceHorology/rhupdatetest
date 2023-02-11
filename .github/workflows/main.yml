@@ -109,7 +109,7 @@ jobs:
             message = "Upload the file"
             content = $base64Content
           } | ConvertTo-Json
-          $response = Invoke-RestMethod -Method Post -Uri "https://api.github.com/repos/RaceHorology/rh-update/contents/FILE_NAME.txt" -Headers @{Authorization = "Token ${{ secrets.GITHUB_TOKEN }}"} -Body $body
+          $response = Invoke-RestMethod -Method Put -Uri "https://api.github.com/repos/RaceHorology/rh-update/contents/FILE_NAME.txt" -Headers @{Authorization = "Token ${{ secrets.GITHUB_TOKEN }}"} -Body $body
         env:
           RELEASE_ID: ${{ steps.uploadAsPreRelease.outputs.id }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
