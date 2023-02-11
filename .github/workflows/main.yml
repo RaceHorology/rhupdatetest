@@ -84,6 +84,11 @@ jobs:
           commit: ${{ needs.build.outputs.commit }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
       - name: output html
         run: |
           Write-Host "Debug HTML ID: ${{ steps.uploadAsPreRelease.outputs.id }}" 
@@ -102,9 +107,23 @@ jobs:
           $release_body = $release.Content | ConvertFrom-Json | Select-Object -ExpandProperty body
           Write-Host $release_body
 
-          #upload the file
+          # generate xml file
 
-          $release_body = "## pre-${{ needs.build.outputs.version }}" + "`r`n" + "`r`n" + "**Datum:** " + $(Get-Date -UFormat %d.%m.%Y) + "`r`n" + "`r`n" + $release_body
+          $xmlfile = Get-Content -Path '${{ github.workspace }}\RaceHorology\.github\workflows\channel.xml.tpl'
+          $xmlfile_new = $xmlfile -replace '__VERSION__', 'pre-${{ needs.build.outputs.version }}'
+          $xmlfile_new = $xmlfile -replace '__DL_URL__', 'https://github.com/RaceHorology/RaceHorology/releases/download/pre-${{ needs.build.outputs.version }}/RaceHorologySetup-${{ needs.build.outputs.version }}.msi'
+          $xmlfile_new = $xmlfile -replace '__CHANGELOG_URL__', 'https://rh-update/racehorology.com/versions/pre-${{ needs.build.outputs.version }}.html'
+
+          #upload the channel file
+          $base64Content = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($xmlfile_new))
+          $body = @{
+            message = "Upload beta-channel.xml file for pre-${{ needs.build.outputs.version }} release via Github Actions from main build project"
+            content = $base64Content
+          } | ConvertTo-Json
+          $response = Invoke-RestMethod -Method Put -Uri "https://api.github.com/repos/RaceHorology/rh-update/contents/channels/beta-channel.xml" -Headers @{Authorization = "Token ${{ secrets.RHUPDATE_SECRET }}"} -Body $body
+
+          #upload the versions file
+          $release_body = "# pre-${{ needs.build.outputs.version }}" + "`r`n" + "`r`n" + "**Datum:** " + $(Get-Date -UFormat %d.%m.%Y) + "`r`n" + "`r`n" + $release_body
 
           $base64Content = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($release_body))
           $body = @{
