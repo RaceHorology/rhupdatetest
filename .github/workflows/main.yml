@@ -84,11 +84,6 @@ jobs:
           commit: ${{ needs.build.outputs.commit }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
       - name: output html
         run: |
           Write-Host "Debug HTML ID: ${{ steps.uploadAsPreRelease.outputs.id }}" 
@@ -115,15 +110,10 @@ jobs:
           $xml_request = Invoke-WebRequest -Method Get -Uri $url -Headers $headers
           $xml_sha = $xml_request.Content | ConvertFrom-Json | Select-Object -ExpandProperty sha
           $xml_content = $xml_request.Content | ConvertFrom-Json | Select-Object -ExpandProperty content
-          #$xml_content = [Convert]::FromBase64String([Text.Encoding]::UTF8.GetBytes($xml_content))
           $xml_content = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($xml_content))
 
 
           # generate xml file content
-          #$xmlfile = Get-Content -Path '${{ github.workspace }}\.github\workflows\channel.xml.tpl'
-          #$xmlfile_new = $xmlfile -replace '__VERSION__', 'pre-${{ needs.build.outputs.version }}'
-          #$xmlfile_new = $xmlfile -replace '__DL_URL__', 'https://github.com/RaceHorology/RaceHorology/releases/download/pre-${{ needs.build.outputs.version }}/RaceHorologySetup-${{ needs.build.outputs.version }}.msi'
-          #$xmlfile_new = $xmlfile -replace '__CHANGELOG_URL__', 'https://rh-update/racehorology.com/versions/pre-${{ needs.build.outputs.version }}.html'
           $xmlfile_new = $xml_content `
               -replace '<url>.*</url>', '<url>https://github.com/RaceHorology/RaceHorology/releases/download/pre-${{ needs.build.outputs.version }}/RaceHorologySetup-${{ needs.build.outputs.version }}.msi</url>' `
               -replace '<changelog>.*</changelog>', '<changelog>https://rh-update/racehorology.com/versions/pre-${{ needs.build.outputs.version }}.html</changelog>' `
