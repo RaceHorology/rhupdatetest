@@ -123,8 +123,8 @@ jobs:
           #$xmlfile_new = $xmlfile -replace '__DL_URL__', 'https://github.com/RaceHorology/RaceHorology/releases/download/pre-${{ needs.build.outputs.version }}/RaceHorologySetup-${{ needs.build.outputs.version }}.msi'
           #$xmlfile_new = $xmlfile -replace '__CHANGELOG_URL__', 'https://rh-update/racehorology.com/versions/pre-${{ needs.build.outputs.version }}.html'
           $xmlfile_new = $xml_content `
-              -replace '<url>.*</url>', '<url>https://github.com/RaceHorology/RaceHorology/releases/download/pre-${{ needs.build.outputs.version }}/RaceHorologySetup-${{ needs.build.outputs.version }}.msi</url>'
-              -replace '<changelog>.*</changelog>', '<changelog>https://rh-update/racehorology.com/versions/pre-${{ needs.build.outputs.version }}.html</changelog>'
+              -replace '<url>.*</url>', '<url>https://github.com/RaceHorology/RaceHorology/releases/download/pre-${{ needs.build.outputs.version }}/RaceHorologySetup-${{ needs.build.outputs.version }}.msi</url>' `
+              -replace '<changelog>.*</changelog>', '<changelog>https://rh-update/racehorology.com/versions/pre-${{ needs.build.outputs.version }}.html</changelog>' `
               -replace '<version>.*</version>', '<version>pre-${{ needs.build.outputs.version }}</version>'
 
 
