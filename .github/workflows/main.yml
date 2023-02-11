@@ -114,7 +114,7 @@ jobs:
           $xmlfile_new = $xmlfile -replace '__CHANGELOG_URL__', 'https://rh-update/racehorology.com/versions/pre-${{ needs.build.outputs.version }}.html'
 
           # get sha from existing xml file
-          $url = "https://api.github.com/repos/$($env:GITHUB_REPOSITORY)/repos/RaceHorology/rh-update/contents/channels/beta-channel.xml"
+          $url = "https://api.github.com/repos/RaceHorology/rh-update/contents/channels/beta-channel.xml"
           $headers = @{
             "Accept" = "application/vnd.github+json"
             "Authorization" = "token ${{ secrets.RHUPDATE_SECRET }}"
