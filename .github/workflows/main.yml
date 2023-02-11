@@ -100,6 +100,7 @@ jobs:
 
           $release = Invoke-WebRequest -Method Get -Uri $url -Headers $headers
           $release_body = $release.Content | ConvertFrom-Json | Select-Object -ExpandProperty body
+          Write-Host $release_body
         env:
           RELEASE_ID: ${{ steps.uploadAsPreRelease.outputs.id }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
