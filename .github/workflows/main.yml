@@ -132,7 +132,7 @@ jobs:
           $base64Content = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($xmlfile_new))
           $body = @{
             message = "Upload beta-channel.xml file for pre-${{ needs.build.outputs.version }} release via Github Actions from main build project"
-            sha = $sha_body
+            sha = $xml_sha
             content = $base64Content
           } | ConvertTo-Json
           $response = Invoke-RestMethod -Method Put -Uri "https://api.github.com/repos/RaceHorology/rh-update/contents/channels/beta-channel.xml" -Headers @{Authorization = "Token ${{ secrets.RHUPDATE_SECRET }}"} -Body $body
