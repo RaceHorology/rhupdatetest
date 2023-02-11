@@ -104,13 +104,14 @@ jobs:
 
           #upload the file
 
+          $release_body = "## pre-${{ needs.build.outputs.version }}" + "`r`n" + "`r`n" + "**Datum:** " + $(Get-Date -UFormat %d.%m.%Y) + "`r`n" + "`r`n" + $release_body
+
           $base64Content = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($release_body))
           $body = @{
-            message = "Upload the file"
+            message = "Upload pre-${{ needs.build.outputs.version }}.html file via Github Actions from main build project"
             content = $base64Content
           } | ConvertTo-Json
-          #$response = Invoke-RestMethod -Method Put -Uri "https://api.github.com/repos/RaceHorology/rh-update/contents/FILE_NAME.txt" -Headers @{Authorization = "Token ${{ secrets.GITHUB_TOKEN }}"} -Body $body
-          $response = Invoke-RestMethod -Method Put -Uri "https://api.github.com/repos/RaceHorology/rh-update/contents/FILE_NAME.txt" -Headers @{Authorization = "Token ${{ secrets.RHUPDATE_SECRET }}"} -Body $body
+          $response = Invoke-RestMethod -Method Put -Uri "https://api.github.com/repos/RaceHorology/rh-update/contents/versions/pre-${{ needs.build.outputs.version }}.md" -Headers @{Authorization = "Token ${{ secrets.RHUPDATE_SECRET }}"} -Body $body
         env:
           RELEASE_ID: ${{ steps.uploadAsPreRelease.outputs.id }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
