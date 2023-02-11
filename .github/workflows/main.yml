@@ -107,13 +107,13 @@ jobs:
           $xml_content = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($xml_content))
 
           # generate xml file content
-          $new_url = "https://github.com/RaceHorology/RaceHorology/releases/download/" + $($env:RELEASE_PREFIX) + ${{ needs.build.outputs.version }} + "/RaceHorologySetup-" + ${{ needs.build.outputs.version }} + ".msi"
-          $new_changelog = "https://update.race-horology.com/versions/" + $($env:RELEASE_PREFIX) + ${{ needs.build.outputs.version }} + ".html"
-          $new_version = $($env:RELEASE_PREFIX) + ${{ needs.build.outputs.version }}
+          $new_url = "<url>https://github.com/RaceHorology/RaceHorology/releases/download/" + $($env:RELEASE_PREFIX) + ${{ needs.build.outputs.version }} + "/RaceHorologySetup-" + ${{ needs.build.outputs.version }} + ".msi</url>"
+          $new_changelog = "<changelog>https://update.race-horology.com/versions/" + $($env:RELEASE_PREFIX) + ${{ needs.build.outputs.version }} + ".html</changelog>"
+          $new_version = "<version>" + $($env:RELEASE_PREFIX) + ${{ needs.build.outputs.version }} + "</version>"
           $xmlfile_new = $xml_content `
-              -replace '<url>.*</url>', '<url>\$new_url</url>' `
-              -replace '<changelog>.*</changelog>', '<changelog>\$new_changelog</changelog>' `
-              -replace '<version>.*</version>', '<version>\$new_version</version>'
+              -replace '<url>.*</url>', ($new_url) `
+              -replace '<changelog>.*</changelog>', ($new_changelog) `
+              -replace '<version>.*</version>', ($new_version)
 
           #upload the channel file
           $base64Content = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($xmlfile_new))
