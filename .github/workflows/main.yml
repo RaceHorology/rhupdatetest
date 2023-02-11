@@ -84,13 +84,7 @@ jobs:
           commit: ${{ needs.build.outputs.commit }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: output html
-        run: |
-          Write-Host "Debug HTML ID: ${{ steps.uploadAsPreRelease.outputs.id }}" 
-          Write-Host "Debug HTML Output: ${{ steps.uploadAsPreRelease.outputs.html_url }}" 
-
-      - name: Retrieve Release Body
-        id: retrieve_body
+      - name: Retrieve Release Body, convert to xml and publish on update system
         run: |
           $url = "https://api.github.com/repos/$($env:GITHUB_REPOSITORY)/releases/$($env:RELEASE_ID)"
           $headers = @{
@@ -102,47 +96,42 @@ jobs:
           Write-Host $release_body
 
           # get sha from existing xml file
-          $url = "https://api.github.com/repos/RaceHorology/rh-update/contents/channels/beta-channel.xml"
+          $url = "https://api.github.com/repos/RaceHorology/rh-update/contents/channels/$($env:RELEASE_PREFIX)-channel.xml"
           $headers = @{
             "Accept" = "application/vnd.github+json"
-            "Authorization" = "token ${{ secrets.RHUPDATE_SECRET }}"
+            "Authorization" = "token $($env:UPDATE_TOKEN)"
           }
           $xml_request = Invoke-WebRequest -Method Get -Uri $url -Headers $headers
           $xml_sha = $xml_request.Content | ConvertFrom-Json | Select-Object -ExpandProperty sha
           $xml_content = $xml_request.Content | ConvertFrom-Json | Select-Object -ExpandProperty content
           $xml_content = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($xml_content))
 
-
           # generate xml file content
           $xmlfile_new = $xml_content `
-              -replace '<url>.*</url>', '<url>https://github.com/RaceHorology/RaceHorology/releases/download/pre-${{ needs.build.outputs.version }}/RaceHorologySetup-${{ needs.build.outputs.version }}.msi</url>' `
-              -replace '<changelog>.*</changelog>', '<changelog>https://rh-update/racehorology.com/versions/pre-${{ needs.build.outputs.version }}.html</changelog>' `
-              -replace '<version>.*</version>', '<version>pre-${{ needs.build.outputs.version }}</version>'
-
+              -replace '<url>.*</url>', '<url>https://github.com/RaceHorology/RaceHorology/releases/download/$($env:RELEASE_PREFIX)${{ needs.build.outputs.version }}/RaceHorologySetup-${{ needs.build.outputs.version }}.msi</url>' `
+              -replace '<changelog>.*</changelog>', '<changelog>https://update.race-horology.com/versions/$($env:RELEASE_PREFIX)${{ needs.build.outputs.version }}.html</changelog>' `
+              -replace '<version>.*</version>', '<version>$($env:RELEASE_PREFIX)$${{ needs.build.outputs.version }}</version>'
 
           #upload the channel file
           $base64Content = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($xmlfile_new))
           $body = @{
-            message = "Upload beta-channel.xml file for pre-${{ needs.build.outputs.version }} release via Github Actions from main build project"
+            message = "Upload $($env:RELEASE_PREFIX)-channel.xml file for $($env:RELEASE_PREFIX)${{ needs.build.outputs.version }} release via Github Actions from main build project"
             sha = $xml_sha
             content = $base64Content
           } | ConvertTo-Json
-          $response = Invoke-RestMethod -Method Put -Uri "https://api.github.com/repos/RaceHorology/rh-update/contents/channels/beta-channel.xml" -Headers @{Authorization = "Token ${{ secrets.RHUPDATE_SECRET }}"} -Body $body
+          $response = Invoke-RestMethod -Method Put -Uri "https://api.github.com/repos/RaceHorology/rh-update/contents/channels/$($env:RELEASE_PREFIX)-channel.xml" -Headers @{Authorization = "Token $($env:UPDATE_TOKEN)"} -Body $body
 
           #upload the versions file
           $release_body = "# pre-${{ needs.build.outputs.version }}" + "`r`n" + "`r`n" + "**Datum:** " + $(Get-Date -UFormat %d.%m.%Y) + "`r`n" + "`r`n" + $release_body
-
           $base64Content = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($release_body))
           $body = @{
-            message = "Upload pre-${{ needs.build.outputs.version }}.html file via Github Actions from main build project"
+            message = "Upload $($env:RELEASE_PREFIX)${{ needs.build.outputs.version }}.html file via Github Actions from main build project"
             content = $base64Content
           } | ConvertTo-Json
-          $response = Invoke-RestMethod -Method Put -Uri "https://api.github.com/repos/RaceHorology/rh-update/contents/versions/pre-${{ needs.build.outputs.version }}.md" -Headers @{Authorization = "Token ${{ secrets.RHUPDATE_SECRET }}"} -Body $body
+          $response = Invoke-RestMethod -Method Put -Uri "https://api.github.com/repos/RaceHorology/rh-update/contents/versions/$($env:RELEASE_PREFIX)${{ needs.build.outputs.version }}.md" -Headers @{Authorization = "Token $($env:UPDATE_TOKEN)"} -Body $body
         env:
           RELEASE_ID: ${{ steps.uploadAsPreRelease.outputs.id }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          release_body: $release_body
-
-      - name: Print Release Body
-        run: |
-          Write-Host "Release Body: ${{steps.retrieve_body.env.release_body}}"
+          UPDATE_TOKEN: ${{ secrets.RHUPDATE_SECRET }}
+          RELEASE_PREFIX: "pre-"
+          RELEASE_CHANNEL: "beta"
