@@ -106,21 +106,27 @@ jobs:
           $release_body = $release.Content | ConvertFrom-Json | Select-Object -ExpandProperty body
           Write-Host $release_body
 
-          # generate xml file content
-
-          $xmlfile = Get-Content -Path '${{ github.workspace }}\.github\workflows\channel.xml.tpl'
-          $xmlfile_new = $xmlfile -replace '__VERSION__', 'pre-${{ needs.build.outputs.version }}'
-          $xmlfile_new = $xmlfile -replace '__DL_URL__', 'https://github.com/RaceHorology/RaceHorology/releases/download/pre-${{ needs.build.outputs.version }}/RaceHorologySetup-${{ needs.build.outputs.version }}.msi'
-          $xmlfile_new = $xmlfile -replace '__CHANGELOG_URL__', 'https://rh-update/racehorology.com/versions/pre-${{ needs.build.outputs.version }}.html'
-
           # get sha from existing xml file
           $url = "https://api.github.com/repos/RaceHorology/rh-update/contents/channels/beta-channel.xml"
           $headers = @{
             "Accept" = "application/vnd.github+json"
             "Authorization" = "token ${{ secrets.RHUPDATE_SECRET }}"
           }
-          $sha = Invoke-WebRequest -Method Get -Uri $url -Headers $headers
-          $sha_body = $release.Content | ConvertFrom-Json | Select-Object -ExpandProperty sha
+          $xml_request = Invoke-WebRequest -Method Get -Uri $url -Headers $headers
+          $xml_sha = $xml_request.Content | ConvertFrom-Json | Select-Object -ExpandProperty sha
+          $xml_content = $xml_request.Content | ConvertFrom-Json | Select-Object -ExpandProperty content
+          $xml_content = [Convert]::FromBase64String([Text.Encoding]::UTF8.GetBytes($xml_content))
+
+          # generate xml file content
+          #$xmlfile = Get-Content -Path '${{ github.workspace }}\.github\workflows\channel.xml.tpl'
+          #$xmlfile_new = $xmlfile -replace '__VERSION__', 'pre-${{ needs.build.outputs.version }}'
+          #$xmlfile_new = $xmlfile -replace '__DL_URL__', 'https://github.com/RaceHorology/RaceHorology/releases/download/pre-${{ needs.build.outputs.version }}/RaceHorologySetup-${{ needs.build.outputs.version }}.msi'
+          #$xmlfile_new = $xmlfile -replace '__CHANGELOG_URL__', 'https://rh-update/racehorology.com/versions/pre-${{ needs.build.outputs.version }}.html'
+          $xmlfile_new = $xml_content `
+              -replace '<url>.*</url>', '<url>https://github.com/RaceHorology/RaceHorology/releases/download/pre-${{ needs.build.outputs.version }}/RaceHorologySetup-${{ needs.build.outputs.version }}.msi</url>'
+              -replace '<changelog>.*</changelog>', '<changelog>https://rh-update/racehorology.com/versions/pre-${{ needs.build.outputs.version }}.html</changelog>'
+              -replace '<version>.*</version>', '<version>pre-${{ needs.build.outputs.version }}</version>'
+
 
           #upload the channel file
           $base64Content = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($xmlfile_new))
