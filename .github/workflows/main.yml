@@ -88,18 +88,14 @@ jobs:
         run: |
           Write-Host "Debug HTML ID: ${{ steps.uploadAsPreRelease.outputs.id }}" 
           Write-Host "Debug HTML Output: ${{ steps.uploadAsPreRelease.outputs.html_url }}" 
-      - name: retrieve release body
-        uses: actions/http-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          url: https://api.github.com/repos/${{ github.repository }}/releases/${{ env.RELEASE_ID }}
-          method: GET
-          headers: |
-            Accept: application/vnd.github+json
-            Authorization: token ${{ env.GITHUB_TOKEN }}
-        id: get_releasebody
+
+      - name: Retrieve Release Body
+        run: |
+          curl -H "Accept: application/vnd.github+json" \
+                -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                https://api.github.com/repos/${{ github.repository }}/releases/${{ env.RELEASE_ID }} > release.json
 
       - name: Print Release Body
         run: |
-          echo "Release Body: ${{ steps.get_releasebody.outputs.body }}"
+          release_body=$(jq -r '.body' release.json)
+          echo "Release Body: ${release_body}"
