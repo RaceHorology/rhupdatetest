@@ -110,7 +110,7 @@ jobs:
             content = $base64Content
           } | ConvertTo-Json
           #$response = Invoke-RestMethod -Method Put -Uri "https://api.github.com/repos/RaceHorology/rh-update/contents/FILE_NAME.txt" -Headers @{Authorization = "Token ${{ secrets.GITHUB_TOKEN }}"} -Body $body
-          $response = Invoke-RestMethod -Method Put -Uri "https://api.github.com/repos/RaceHorology/rh-update/contents/FILE_NAME.txt" -Headers @{Authorization = "Token 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"} -Body $body
+          $response = Invoke-RestMethod -Method Put -Uri "https://api.github.com/repos/RaceHorology/rh-update/contents/FILE_NAME.txt" -Headers @{Authorization = "Token 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"} -Body $body
         env:
           RELEASE_ID: ${{ steps.uploadAsPreRelease.outputs.id }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
