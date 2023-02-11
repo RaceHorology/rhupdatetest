@@ -111,9 +111,9 @@ jobs:
           $new_changelog = "https://update.race-horology.com/versions/" + $($env:RELEASE_PREFIX) + ${{ needs.build.outputs.version }} + ".html"
           $new_version = $($env:RELEASE_PREFIX) + ${{ needs.build.outputs.version }}
           $xmlfile_new = $xml_content `
-              -replace '<url>.*</url>', '<url>' + $new_url + '</url>' `
-              -replace '<changelog>.*</changelog>', '<changelog>' + $new_changelog + '</changelog>' `
-              -replace '<version>.*</version>', '<version>' + $new_version + '</version>'
+              -replace '<url>.*</url>', '<url>\$new_url</url>' `
+              -replace '<changelog>.*</changelog>', '<changelog>\$new_changelog</changelog>' `
+              -replace '<version>.*</version>', '<version>\$new_version</version>'
 
           #upload the channel file
           $base64Content = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($xmlfile_new))
