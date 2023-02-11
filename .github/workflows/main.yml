@@ -101,6 +101,7 @@ jobs:
           $release_body = $release.Content | ConvertFrom-Json | Select-Object -ExpandProperty body
         env:
           RELEASE_ID: ${{ steps.uploadAsPreRelease.outputs.id }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Print Release Body
         run: |
