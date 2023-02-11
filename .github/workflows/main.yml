@@ -51,12 +51,6 @@ jobs:
           Write-Host "Output of minor: ${{ steps.version.outputs.minor }}"         
           Write-Host "Output of patch: ${{ steps.version.outputs.patch }}"         
 
-      - uses: actions/cache@v3
-        id: cache
-        with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-    
   upload_as_release:
     if: ${{ startsWith(github.ref, 'refs/heads/release') }}
     needs: [build]
