@@ -87,11 +87,14 @@ jobs:
         run: |
           Write-Host "Debug HTML Output: ${{ steps.uploadAsPreRelease.outputs.html_url }}" 
       - name: retrieve release body
-        uses: actions/github@v2
+        uses: actions/github-script@v6
         id: get_releasebody
-        ref: ${{ env.GITHUB_REF }}
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        action: get-release
+        with: 
+          script: |
+            const release = await github.rest.releases({
+              release_id: release.id
+            });
+            console.log(release.data.body);
         release-id: ${{ steps.uploadAsPreRelease.outputs.id }}        
       - name: Print Release Body
         run: |
