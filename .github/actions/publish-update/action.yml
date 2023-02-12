@@ -54,27 +54,27 @@ runs:
         $xml_content = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($xml_content))
 
         # generate xml file content
-        $new_url = "<url>https://github.com/RaceHorology/RaceHorology/releases/download/" + "${{ inputs.release_prefix }}" + "${{ inputs.release_version }}" + "/RaceHorologySetup-" + "${{ inputs.release_version }}" + ".msi</url>"
-        $new_changelog = "<changelog>https://update.race-horology.com/versions/" + "${{ inputs.release_prefix }}" + "${{ inputs.release_version }}" + ".html</changelog>"
-        $new_version = "<version>" + "${{ inputs.release_prefix }}" + "${{ inputs.release_version }}" + "</version>"
+        $new_url = "<url>https://github.com/RaceHorology/RaceHorology/releases/download/" + "${{ inputs.release_version }}" + "${{ inputs.release_prefix }}" + "/RaceHorologySetup-" + "${{ inputs.release_version }}" + ".msi</url>"
+        $new_changelog = "<changelog>https://update.race-horology.com/versions/" + "${{ inputs.release_version }}" + "${{ inputs.release_prefix }}" + ".html</changelog>"
+        $new_version = "<version>" + "${{ inputs.release_version }}" + "${{ inputs.release_prefix }}" + "</version>"
         $xmlfile_new = $xml_content `
             -replace '<url>.*</url>', ($new_url) `
             -replace '<changelog>.*</changelog>', ($new_changelog) `
             -replace '<version>.*</version>', ($new_version)
 
         #upload the versions file
-        $release_body = "# pre-${{ inputs.release_version }}" + "`r`n" + "`r`n" + "**Datum:** " + $(Get-Date -UFormat %d.%m.%Y) + "`r`n" + "`r`n" + $release_body
+        $release_body = "# ${{ inputs.release_version }}${{ inputs.release_prefix }} " + "`r`n" + "`r`n" + "**Datum:** " + $(Get-Date -UFormat %d.%m.%Y) + "`r`n" + "`r`n" + $release_body
         $base64Content = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($release_body))
         $body = @{
-          message = "Upload ${{ inputs.release_prefix }}${{ inputs.release_version }}.md file via Github Actions from main build project"
+          message = "Upload ${{ inputs.release_version }}${{ inputs.release_prefix }}.md file via Github Actions from main build project"
           content = $base64Content
         } | ConvertTo-Json
-        $response = Invoke-RestMethod -Method Put -Uri "https://api.github.com/repos/RaceHorology/rh-update/contents/versions/${{ inputs.release_prefix }}${{ inputs.release_version }}.md" -Headers @{Authorization = "Token ${{ inputs.update_token }}"} -Body $body
+        $response = Invoke-RestMethod -Method Put -Uri "https://api.github.com/repos/RaceHorology/rh-update/contents/versions/${{ inputs.release_version }}${{ inputs.release_prefix }}.md" -Headers @{Authorization = "Token ${{ inputs.update_token }}"} -Body $body
 
         #upload the channel file
         $base64Content = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($xmlfile_new))
         $body = @{
-          message = "Upload ${{ inputs.release_channel }}-channel.xml file for ${{ inputs.release_prefix }}${{ inputs.release_version }} release via Github Actions from main build project"
+          message = "Upload ${{ inputs.release_channel }}-channel.xml file for ${{ inputs.release_version }}${{ inputs.release_prefix }} release via Github Actions from main build project"
           sha = $xml_sha
           content = $base64Content
         } | ConvertTo-Json

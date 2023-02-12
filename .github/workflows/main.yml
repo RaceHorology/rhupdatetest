@@ -91,7 +91,7 @@ jobs:
         uses: ncipollo/release-action@v1.12.0
         with:
           prerelease: true
-          tag: pre-${{ needs.build.outputs.version }}
+          tag: ${{ needs.build.outputs.version }}-pre
           name: Automatic build from main pre-${{ needs.build.outputs.version }}
           body: Achtung 
                 Diese Version wurde automatisch aus den letzten Quellcodeänderungen gebaut und stellt nur den letzten Stand der Änderungen dar.
@@ -110,6 +110,6 @@ jobs:
           release_id: ${{ steps.uploadAsPreRelease.outputs.id }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           update_token: ${{ secrets.RHUPDATE_SECRET }}
-          release_prefix: "pre-"
+          release_prefix: "-pre"
           release_channel: "testbeta"
           release_version: ${{ needs.build.outputs.version }}
