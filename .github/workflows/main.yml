@@ -89,7 +89,7 @@ jobs:
 
       - name: publish on update server with github action reference
         id: publish_externally
-        uses: ./.github/actions/publish-update.yml
+        uses: ./.github/actions/publish-update
         with:
           RELEASE_ID: ${{ steps.uploadAsPreRelease.outputs.id }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
