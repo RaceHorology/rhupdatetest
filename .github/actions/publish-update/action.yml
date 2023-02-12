@@ -33,7 +33,7 @@ runs:
   steps: 
     - id: get_release_body
       run: |
-        $url = "https://api.github.com/repos/RaceHorology/RaceHorology/releases/${{ inputs.release_id }}"
+        $url = "https://api.github.com/repos/RaceHorology/rhupdatetest/releases/${{ inputs.release_id }}"
         $headers = @{
           "Accept" = "application/vnd.github+json"
           "Authorization" = "token ${{ inputs.github_token }}"
