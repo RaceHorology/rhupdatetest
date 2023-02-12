@@ -93,3 +93,4 @@ jobs:
           UPDATE_TOKEN: ${{ secrets.RHUPDATE_SECRET }}
           RELEASE_PREFIX: "pre-"
           RELEASE_CHANNEL: "beta"
+          RELEASE_VERSION: ${{ needs.build.outputs.version }}
