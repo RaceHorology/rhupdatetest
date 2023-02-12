@@ -57,6 +57,7 @@ jobs:
     runs-on: [windows-latest]
     steps:
       - name: Create release entry on GitHub
+        id: uploadAsRelease
         uses: ncipollo/release-action@v1.12.0
         with:
           prerelease: false
@@ -64,6 +65,21 @@ jobs:
           commit: ${{ needs.build.outputs.commit }}
           token: ${{ secrets.GITHUB_TOKEN }}
           generateReleaseNotes: true
+
+      - name: Checkout for publish on server
+        uses: actions/checkout@v1
+
+      - name: publish on update server with github action reference
+        id: publish_externally
+        uses: ./.github/actions/publish-update
+        with:
+          release_id: ${{ steps.uploadAsRelease.outputs.id }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          update_token: ${{ secrets.RHUPDATE_SECRET }}
+          release_prefix: ""
+          release_channel: "stable"
+          release_version: ${{ needs.build.outputs.version }}
+
 
   upload_as_pre-release:
     if: ${{ startsWith(github.ref, 'refs/heads/main') }}
