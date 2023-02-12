@@ -86,7 +86,7 @@ jobs:
 
       - name: publish on update server with github action reference
         id: publish externally
-        uses: action/publish-udpate
+        uses: actions/publish-udpate@v1
         with:
           RELEASE_ID: ${{ steps.uploadAsPreRelease.outputs.id }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
