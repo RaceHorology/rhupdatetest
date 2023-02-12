@@ -1,26 +1,26 @@
 name: 'Publish releases to Update server'
 inputs:
-  RELEASE_ID:
+  release_id:
     description: 'the id of the release'
     required: true
     default: ''
-  GITHUB_TOKEN:
+  github_token:
     description: 'github internal token for this repo'
     required: true
     default: ''
-  UPDATE_TOKEN:
+  update_token:
     description: 'PAT that was created for the update repo'
     required: true
     default: ''
-  RELEASE_PREFIX:
+  release_prefix:
     description: 'is either pre- or nothing for a stable release'
     required: true
     default: 'pre-'
-  RELEASE_CHANNEL:
+  release_channel:
     description: 'the channel where the release is updated'
     required: true
     default: 'beta'
-  RELEASE_VERSION:
+  release_version:
     description: 'the version of the release'
     required: true
     default: ''    
@@ -33,20 +33,20 @@ runs:
   steps: 
     - id: get_release_body
       run: |
-        $url = "https://api.github.com/repos/RaceHorology/RaceHorology/releases/${{ inputs.RELEASE_ID }}"
+        $url = "https://api.github.com/repos/RaceHorology/RaceHorology/releases/${{ inputs.release_id }}"
         $headers = @{
           "Accept" = "application/vnd.github+json"
-          "Authorization" = "token ${{ inputs.GITHUB_TOKEN }}"
+          "Authorization" = "token ${{ inputs.github_token }}"
         }
         $release = Invoke-WebRequest -Method Get -Uri $url -Headers $headers
         $release_body = $release.Content | ConvertFrom-Json | Select-Object -ExpandProperty body
         Write-Host $release_body
 
         # get sha from existing xml file
-        $url = "https://api.github.com/repos/RaceHorology/rh-update/contents/channels/${{ inputs.RELEASE_CHANNEL }}-channel.xml"
+        $url = "https://api.github.com/repos/RaceHorology/rh-update/contents/channels/${{ inputs.release_channel }}-channel.xml"
         $headers = @{
           "Accept" = "application/vnd.github+json"
-          "Authorization" = "token ${{ inputs.UPDATE_TOKEN }}"
+          "Authorization" = "token ${{ inputs.update_token }}"
         }
         $xml_request = Invoke-WebRequest -Method Get -Uri $url -Headers $headers
         $xml_sha = $xml_request.Content | ConvertFrom-Json | Select-Object -ExpandProperty sha
@@ -54,30 +54,30 @@ runs:
         $xml_content = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($xml_content))
 
         # generate xml file content
-        $new_url = "<url>https://github.com/RaceHorology/RaceHorology/releases/download/" + "${{ inputs.RELEASE_PREFIX }}" + "${{ inputs.RELEASE_VERSION }}" + "/RaceHorologySetup-" + "${{ inputs.RELEASE_VERSION }}" + ".msi</url>"
-        $new_changelog = "<changelog>https://update.race-horology.com/versions/" + "${{ inputs.RELEASE_PREFIX }}" + "${{ inputs.RELEASE_VERSION }}" + ".html</changelog>"
-        $new_version = "<version>" + "${{ inputs.RELEASE_PREFIX }}" + "${{ inputs.RELEASE_VERSION }}" + "</version>"
+        $new_url = "<url>https://github.com/RaceHorology/RaceHorology/releases/download/" + "${{ inputs.release_prefix }}" + "${{ inputs.release_version }}" + "/RaceHorologySetup-" + "${{ inputs.release_version }}" + ".msi</url>"
+        $new_changelog = "<changelog>https://update.race-horology.com/versions/" + "${{ inputs.release_prefix }}" + "${{ inputs.release_version }}" + ".html</changelog>"
+        $new_version = "<version>" + "${{ inputs.release_prefix }}" + "${{ inputs.release_version }}" + "</version>"
         $xmlfile_new = $xml_content `
             -replace '<url>.*</url>', ($new_url) `
             -replace '<changelog>.*</changelog>', ($new_changelog) `
             -replace '<version>.*</version>', ($new_version)
 
         #upload the versions file
-        $release_body = "# pre-${{ inputs.RELEASE_VERSION }}" + "`r`n" + "`r`n" + "**Datum:** " + $(Get-Date -UFormat %d.%m.%Y) + "`r`n" + "`r`n" + $release_body
+        $release_body = "# pre-${{ inputs.release_version }}" + "`r`n" + "`r`n" + "**Datum:** " + $(Get-Date -UFormat %d.%m.%Y) + "`r`n" + "`r`n" + $release_body
         $base64Content = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($release_body))
         $body = @{
-          message = "Upload ${{ inputs.RELEASE_PREFIX }}${{ inputs.RELEASE_VERSION }}.md file via Github Actions from main build project"
+          message = "Upload ${{ inputs.release_prefix }}${{ inputs.release_version }}.md file via Github Actions from main build project"
           content = $base64Content
         } | ConvertTo-Json
-        $response = Invoke-RestMethod -Method Put -Uri "https://api.github.com/repos/RaceHorology/rh-update/contents/versions/${{ inputs.RELEASE_PREFIX }}${{ inputs.RELEASE_VERSION }}.md" -Headers @{Authorization = "Token ${{ inputs.UPDATE_TOKEN }}"} -Body $body
+        $response = Invoke-RestMethod -Method Put -Uri "https://api.github.com/repos/RaceHorology/rh-update/contents/versions/${{ inputs.release_prefix }}${{ inputs.release_version }}.md" -Headers @{Authorization = "Token ${{ inputs.update_token }}"} -Body $body
 
         #upload the channel file
         $base64Content = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($xmlfile_new))
         $body = @{
-          message = "Upload ${{ inputs.RELEASE_CHANNEL }}-channel.xml file for ${{ inputs.RELEASE_PREFIX }}${{ inputs.RELEASE_VERSION }} release via Github Actions from main build project"
+          message = "Upload ${{ inputs.release_channel }}-channel.xml file for ${{ inputs.release_prefix }}${{ inputs.release_version }} release via Github Actions from main build project"
           sha = $xml_sha
           content = $base64Content
         } | ConvertTo-Json
-        $response = Invoke-RestMethod -Method Put -Uri "https://api.github.com/repos/RaceHorology/rh-update/contents/channels/${{ inputs.RELEASE_CHANNEL }}-channel.xml" -Headers @{Authorization = "Token ${{ inputs.UPDATE_TOKEN }}"} -Body $body
+        $response = Invoke-RestMethod -Method Put -Uri "https://api.github.com/repos/RaceHorology/rh-update/contents/channels/${{ inputs.release_channel }}-channel.xml" -Headers @{Authorization = "Token ${{ inputs.update_token }}"} -Body $body
 
       shell: pwsh

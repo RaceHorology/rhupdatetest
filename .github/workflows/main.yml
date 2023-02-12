@@ -91,9 +91,9 @@ jobs:
         id: publish_externally
         uses: ./.github/actions/publish-update
         with:
-          RELEASE_ID: ${{ steps.uploadAsPreRelease.outputs.id }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          UPDATE_TOKEN: ${{ secrets.RHUPDATE_SECRET }}
-          RELEASE_PREFIX: "pre-"
-          RELEASE_CHANNEL: "beta"
-          RELEASE_VERSION: ${{ needs.build.outputs.version }}
+          release_id: ${{ steps.uploadAsPreRelease.outputs.id }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          update_token: ${{ secrets.RHUPDATE_SECRET }}
+          release_prefix: "pre-"
+          release_channel: "beta"
+          release_version: ${{ needs.build.outputs.version }}
