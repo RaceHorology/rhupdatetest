@@ -84,10 +84,13 @@ jobs:
           commit: ${{ needs.build.outputs.commit }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Checkout for publish on server
+        uses: actions/checkout@v1
+
       - name: publish on update server with github action reference
         id: publish_externally
-        uses: actions/publish-udpate@v1
-        with:
+        uses: ./.github/actions/publish-udpate
+         with:
           RELEASE_ID: ${{ steps.uploadAsPreRelease.outputs.id }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           UPDATE_TOKEN: ${{ secrets.RHUPDATE_SECRET }}
