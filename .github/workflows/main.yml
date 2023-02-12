@@ -61,10 +61,11 @@ jobs:
         uses: ncipollo/release-action@v1.12.0
         with:
           prerelease: false
-          tag: ${{ needs.build.outputs.version_tag }}
+          tag: v${{ needs.build.outputs.version_tag }}
           commit: ${{ needs.build.outputs.commit }}
           token: ${{ secrets.GITHUB_TOKEN }}
           generateReleaseNotes: true
+          makeLatest: true
 
       - name: Checkout for publish on server
         uses: actions/checkout@v1
@@ -78,7 +79,7 @@ jobs:
           update_token: ${{ secrets.RHUPDATE_SECRET }}
           release_prefix: "v"
           release_channel: "teststable"
-          release_version: ${{ needs.build.outputs.version }}
+          release_version: v${{ needs.build.outputs.version }}
 
 
   upload_as_pre-release:
@@ -92,10 +93,10 @@ jobs:
         with:
           prerelease: true
           tag: ${{ needs.build.outputs.version }}-pre
-          name: Automatic build from main pre-${{ needs.build.outputs.version }}
+          name: ${{ needs.build.outputs.version }}-pre (Automatic build from main)
           body: Achtung 
                 Diese Version wurde automatisch aus den letzten Quellcodeänderungen gebaut und stellt nur den letzten Stand der Änderungen dar.
-                Sie könnte daher instabil sein.
+                Sie könnte daher instabil sein oder unvorhergesehene Probleme mit sich führen. 
           generateReleaseNotes: true
           commit: ${{ needs.build.outputs.commit }}
           token: ${{ secrets.GITHUB_TOKEN }}
