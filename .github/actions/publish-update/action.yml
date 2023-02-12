@@ -30,7 +30,7 @@ outputs:
     value: "${{ steps.get_release_body.outputs.release_body }}"
 runs:
   using: "composite"
-  steps:  ${{ inputs.RELEASE_CHANNEL }}
+  steps: 
     - id: get_release_body
       run: |
         $url = "https://api.github.com/repos/RaceHorology/RaceHorology/releases/${{ inputs.RELEASE_ID }}"
