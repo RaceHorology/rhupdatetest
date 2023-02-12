@@ -76,8 +76,8 @@ jobs:
           release_id: ${{ steps.uploadAsRelease.outputs.id }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           update_token: ${{ secrets.RHUPDATE_SECRET }}
-          release_prefix: ""
-          release_channel: "stable"
+          release_prefix: "v"
+          release_channel: "teststable"
           release_version: ${{ needs.build.outputs.version }}
 
 
@@ -111,5 +111,5 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           update_token: ${{ secrets.RHUPDATE_SECRET }}
           release_prefix: "pre-"
-          release_channel: "beta"
+          release_channel: "testbeta"
           release_version: ${{ needs.build.outputs.version }}
